@@ -1,9 +1,9 @@
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useCallback } from "react";
 
 const App = () => {
 
   // our states 
- const [state, setState] = useState({
+  const [state, setState] = useState({
     name: "",
     user: "",
     email: "",
@@ -11,12 +11,22 @@ const App = () => {
     item: []
   })
 
-
-
+  // debouncing function
+  const debounce = (func) => {
+    let timer;
+    return function (...args) {
+      const context = this;
+      if (timer) clearTimeout(timer);
+      timer = setTimeout(() => {
+        timer = null;
+        func.apply(context, args);
+      }, 2000);
+    };
+  };
 
 
   // fetching api through axios
- useEffect(() => {
+  useEffect(() => {
     const fetchData = () => {
       fetch('https://jsonplaceholder.typicode.com/users')
         .then(resp => resp.json())
@@ -39,12 +49,22 @@ const App = () => {
       }
     })
   }, [state, state.name, state.user, state.email, state.phone])
-  
-  
+
+
   const handleEvent = (e) => {
     const value = e.target.value;
     const id = e.target.id
     setState((preState) => ({ ...preState, [id]: value }))
+  }
+
+  const optimizedFn = useCallback(debounce(handleEvent), []);
+
+  const handleCLick = (e) => {
+
+    console.log({
+      name: state.item
+    })
+
   }
 
 
@@ -58,11 +78,11 @@ const App = () => {
             <tr className="tableHeading">
               <th>Name
                 <br></br>
-                <input type="search" id="name" placeholder="Search..." value={state.name} onChange={handleEvent} />
+                <input type="search" id="name" placeholder="Search..." onChange={optimizedFn} />
               </th>
               <th>User Name
                 <br></br>
-                <input type="search" id="user" placeholder="Search..." value={state.user} onChange={handleEvent} />
+                <input type="search" id="user" placeholder="Search..." onChange={optimizedFn} />
               </th>
               <th>Email
                 <br></br>
@@ -79,16 +99,21 @@ const App = () => {
               FilterItem.map((val, index) => {
                 return (
                   <tr className="tableItem" key={index} style={{ textAlign: "center" }}>
-                    <td>{val.name}</td>
-                    <td>{val.username}</td>
-                    <td>{val.email}</td>
-                    <td>{val.phone}</td>
+                    <td onClick={handleCLick}>
+                      {val.name}
+                    </td>
+                    <td onClick={handleCLick}>
+                      {val.username}
+                    </td>
+                    <td onClick={handleCLick}>
+                      {val.email}
+                    </td>
+                    <td onClick={handleCLick}>
+                      {val.phone}
+                    </td>
                   </tr>
                 )
               })
-            }
-            {
-              FilterItem.length === 0 && state.item !== "" && "No matches..."
             }
           </tbody>
         </table>
