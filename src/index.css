@@ -1,0 +1,11 @@
+.tableHeading input {
+  margin: 10px 20px;
+  padding: 7px;
+  font-size: 15px;
+  border: 1px solid black;
+  border-radius: 5px;
+}
+
+.tableItem td {
+  padding: 2rem 0;
+}
