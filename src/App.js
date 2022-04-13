@@ -3,41 +3,49 @@ import { useState, useEffect, useMemo } from "react";
 const App = () => {
 
   // our states 
-  const [data, setData] = useState([]);
-  const [filterName, setFilterName] = useState("");
-  const [filterUser, setFilterUser] = useState("");
-  const [filterEmail, setFilterEmail] = useState("");
-  const [filterPhone, setFilterPhone] = useState("");
+ const [state, setState] = useState({
+    name: "",
+    user: "",
+    email: "",
+    phone: "",
+    item: []
+  })
 
 
 
 
 
   // fetching api through axios
-  useEffect(() => {
+ useEffect(() => {
     const fetchData = () => {
       fetch('https://jsonplaceholder.typicode.com/users')
         .then(resp => resp.json())
         .then(itm => {
-          setData(itm)
+          setState(prevState => ({ ...prevState, item: itm }))
         })
     }
     fetchData();
   }, [])
 
-  const fetchItem = useMemo(() => {
-    return data.filter(item => {
-      if (filterName === '' && filterUser === '' && filterEmail === '' && filterPhone === '') {
+  const FilterItem = useMemo(() => {
+    return state.item.filter(item => {
+      if (state.name === "" && state.user === "" && state.email === "" && state.phone === "") {
         return item
-      }
-      else if (item.name.toLowerCase().includes(filterName.toLocaleLowerCase()) &&
-        item.username.toLowerCase().includes(filterUser.toLocaleLowerCase()) &&
-        item.email.toLowerCase().includes(filterEmail.toLocaleLowerCase()) &&
-        item.phone.includes(filterPhone)) {
+      } else if (item.name.toLowerCase().includes(state.name.toLocaleLowerCase()) &&
+        item.username.toLowerCase().includes(state.user.toLocaleLowerCase()) &&
+        item.email.toLowerCase().includes(state.email.toLocaleLowerCase()) &&
+        item.phone.includes(state.phone)) {
         return item;
       }
     })
-  }, [data, filterName, filterUser, filterEmail, filterPhone])
+  }, [state, state.name, state.user, state.email, state.phone])
+  
+  
+  const handleEvent = (e) => {
+    const value = e.target.value;
+    const id = e.target.id
+    setState((preState) => ({ ...preState, [id]: value }))
+  }
 
 
   // returning jsx  
@@ -50,25 +58,25 @@ const App = () => {
             <tr className="tableHeading">
               <th>Name
                 <br></br>
-                <input type="search" placeholder="Search..." value={filterName} onChange={(e) => setFilterName(e.target.value)} />
+                <input type="search" id="name" placeholder="Search..." value={state.name} onChange={handleEvent} />
               </th>
               <th>User Name
                 <br></br>
-                <input type="search" placeholder="Search..." value={filterUser} onChange={(e) => setFilterUser(e.target.value)} />
+                <input type="search" id="user" placeholder="Search..." value={state.user} onChange={handleEvent} />
               </th>
               <th>Email
                 <br></br>
-                <input type="search" placeholder="Search..." value={filterEmail} onChange={(e) => setFilterEmail(e.target.value)} />
+                <input type="search" id="email" placeholder="Search..." value={state.email} onChange={handleEvent} />
               </th>
               <th>Phone
                 <br></br>
-                <input type="search" placeholder="Search..." value={filterPhone} onChange={(e) => setFilterPhone(e.target.value)} />
+                <input type="search" id="phone" placeholder="Search..." value={state.phone} onChange={handleEvent} />
               </th>
             </tr>
           </thead>
           <tbody>
             {
-              fetchItem.map((val, index) => {
+              FilterItem.map((val, index) => {
                 return (
                   <tr className="tableItem" key={index} style={{ textAlign: "center" }}>
                     <td>{val.name}</td>
@@ -78,6 +86,9 @@ const App = () => {
                   </tr>
                 )
               })
+            }
+            {
+              FilterItem.length === 0 && state.item !== "" && "No matches..."
             }
           </tbody>
         </table>
