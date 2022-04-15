@@ -1,3 +1,8 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
 .tableHeading input {
   margin: 10px 20px;
   padding: 7px;
@@ -8,4 +13,29 @@
 
 .tableItem td {
   padding: 2rem 0;
+}
+
+.updateBox {
+  background-color: blanchedalmond;
+  width: 100%;
+  padding: 30px;
+}
+
+.updateBox button {
+  margin: 15px 0;
+  padding: 5px;
+  border: 1px solid;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+form {
+  text-align: start;
+}
+
+form input {
+  margin: 10px 0;
+  width: 30%;
+  padding: 6px;
+  font-size: 16px;
 }
