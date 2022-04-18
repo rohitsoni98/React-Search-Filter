@@ -8,7 +8,11 @@ const App = () => {
     email: "",
     phone: "",
     item: [],
+    showUpdate: false,
+    showAdd: true
   });
+
+  const [submitBtn, setSubmitBtn] = useState(false);
 
   const [update, setUpdate] = useState({
     Name: "",
@@ -71,27 +75,42 @@ const App = () => {
 
   // const optimizedFn = useCallback(debounce(handleEvent), []);
 
-  const handleCLick = (i) => {
-    setUpdate((prevState) => ({
-      ...prevState,
-      id: state.item[i].id,
-      Name: state.item[i].name,
-      UserName: state.item[i].username,
-      Email: state.item[i].email,
-      Phone: state.item[i].phone,
-    }));
+  const handleCLick = (val) => {
+    setUpdate({
+      id: val.id,
+      Name: val.name,
+      UserName: val.username,
+      Email: val.email,
+      Phone: val.phone,
+    });
+    setSubmitBtn(true);
+    setState((prevState) => ({ ...prevState, showUpdate: true, showAdd: false }))
   };
 
+  const AddBtn = () => {
+    let newList = state.item;
+    newList.push({ name: update.Name, username: update.UserName, email: update.Email, phone: update.Phone })
+    setState((prev) => ({ ...prev, item: newList, showUpdate: false, showAdd: true }))
+    setUpdate({
+      Name: "",
+      UserName: "",
+      Email: "",
+      Phone: "",
+      id: ""
+    })
+  }
   const handleSubmit = (e) => {
     e.preventDefault();
     let newList = state.item.map((items) => {
       if (items.id === update.id) {
         return { ...items, name: update.Name, username: update.UserName, email: update.Email, phone: update.Phone }
-      } else {
-        return items;
+      }
+      else {
+        return items
       }
     })
-    setState((prev) => ({ ...prev, item: newList }))
+    setState((prev) => ({ ...prev, item: newList, showUpdate: false, showAdd: true }))
+    setSubmitBtn(false);
     setUpdate({
       Name: "",
       UserName: "",
@@ -170,12 +189,13 @@ const App = () => {
                 <tr
                   className="tableItem"
                   key={index}
-                  style={{ textAlign: "center" }}
+                  style={{ textAlign: "center", cursor: "pointer" }}
+                  onClick={() => handleCLick(val)}
                 >
-                  <td onClick={() => handleCLick(index, val.id)}>{val.name}</td>
-                  <td onClick={() => handleCLick(index)}>{val.username}</td>
-                  <td onClick={() => handleCLick(index)}>{val.email}</td>
-                  <td onClick={() => handleCLick(index)}>{val.phone}</td>
+                  <td >{val.name}</td>
+                  <td >{val.username}</td>
+                  <td >{val.email}</td>
+                  <td >{val.phone}</td>
                   {/* <td>
                     <button style={{ padding: "5px", borderRadius: "5px", cursor: "pointer" }}>
                       Edit
@@ -187,48 +207,61 @@ const App = () => {
           </tbody>
         </table>
       </div>
-      <div className="updateBox">
-        <h1 style={{ textAlign: "center", marginBottom: "20px" }}>
-          Update Item
-        </h1>
-        <form
-          onSubmit={handleSubmit}
-          style={{
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "center",
-            alignItems: "center",
-          }}
-        >
-          Name: {update.Name}
-          <input
-            type="text"
-            value={update.Name}
-            onChange={(e) => setUpdate((preState) => ({ ...preState, Name: e.target.value }))}
-          />
-          User Name: {update.UserName}
-          <input
-            type="text"
-            value={update.UserName}
-            onChange={(e) =>
-              setUpdate((preState) => ({ ...preState, UserName: e.target.value }))
+      {
+        state.showUpdate &&
+        <div className="updateBox">
+          <h1 style={{ textAlign: "center", marginBottom: "20px" }}>
+            Update Item / Add Item
+          </h1>
+          <form
+            onSubmit={handleSubmit}
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+            }}
+          >
+            Name:
+            <input
+              type="text"
+              value={update.Name}
+              onChange={(e) => setUpdate((preState) => ({ ...preState, Name: e.target.value }))}
+            />
+            User Name:
+            <input
+              type="text"
+              value={update.UserName}
+              onChange={(e) =>
+                setUpdate((preState) => ({ ...preState, UserName: e.target.value }))
+              }
+            />
+            Email:
+            <input
+              type="email"
+              value={update.Email}
+              onChange={(e) => setUpdate((preState) => ({ ...preState, Email: e.target.value }))}
+            />
+            Phone:
+            <input
+              type="text"
+              value={update.Phone}
+              onChange={(e) => setUpdate((preState) => ({ ...preState, Phone: e.target.value }))}
+            />
+            {
+              submitBtn ?
+                <button type="submit">Update Submit</button> :
+                <button onClick={AddBtn}>Add Item</button>
             }
-          />
-          Email: {update.Email}
-          <input
-            type="email"
-            value={update.Email}
-            onChange={(e) => setUpdate((preState) => ({ ...preState, Email: e.target.value }))}
-          />
-          Phone: {update.Phone}
-          <input
-            type="text"
-            value={update.Phone}
-            onChange={(e) => setUpdate((preState) => ({ ...preState, Phone: e.target.value }))}
-          />
-          <button type="submit">Update Table</button>
-        </form>
-      </div>
+            <button onClick={() => setSubmitBtn(false)}>Close</button>
+          </form>
+        </div>
+
+      }
+      {
+        state.showAdd &&
+        <button className="btn-add" onClick={() => setState((preState) => ({ ...preState, showUpdate: true, showAdd: false }))}>Add Item</button>
+      }
     </div>
   );
 };
